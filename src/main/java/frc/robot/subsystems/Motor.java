@@ -9,7 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Motor<T> extends SubsystemBase{
+public class Motor extends SubsystemBase{
     
     private SparkMax m_sparkMax;
     private SparkFlex m_sparkFlex;  
