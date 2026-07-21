@@ -9,7 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Motor extends SubsystemBase{
+public class CalibrationV1 extends SubsystemBase{
     
     private SparkMax m_sparkMax;
     private SparkFlex m_sparkFlex;  
@@ -19,25 +19,23 @@ public class Motor extends SubsystemBase{
     private PIDController c_pidController = new PIDController(kp, ki, kd); 
 
     private double speed; 
-    private double target; 
+    private double target = -1; 
     private double positions[] = new double[50];
     private double tolerance; 
 
-    public Motor(SparkMax m_sparkMax, CANcoder encoder, double target, double tolerance) {
+    public CalibrationV1(SparkMax m_sparkMax, CANcoder encoder, double tolerance) {
         this.m_sparkMax = m_sparkMax; 
         this.encoder = encoder; 
 
-        this.target = target; 
         this.tolerance = tolerance; 
 
         c_pidController.setTolerance(this.tolerance);
     }
 
-    public Motor(SparkFlex m_sparkFlex, CANcoder encoder, double target, double tolerance) {
+    public CalibrationV1(SparkFlex m_sparkFlex, CANcoder encoder, double tolerance) {
         this.m_sparkFlex = m_sparkFlex; 
         this.encoder = encoder;
         
-        this.target = target; 
         this.tolerance = tolerance; 
 
         c_pidController.setTolerance(this.tolerance);
@@ -49,17 +47,21 @@ public class Motor extends SubsystemBase{
 
         m_sparkMax.set(speed); 
 
-        if (get_position() < target-tolerance) {
-            kp+=0.01; 
-            set_PID(); 
-        } else if (get_position() > target+tolerance) {
-            kp-=0.01; 
-            set_PID();
+        if (target != -1) {
+            if (get_position() < target-tolerance) {
+                kp+=0.01; 
+                set_PID(); 
+            } else if (get_position() > target+tolerance) {
+                kp-=0.01; 
+                set_PID();
+            }
         }
+        
     }
 
-    public void set_setpoint() {
-        c_pidController.setSetpoint(250);
+    public void set_setpoint(double target) {
+        this.target = target;
+        c_pidController.setSetpoint(this.target);
     }
 
     public boolean at_setpoint() {
